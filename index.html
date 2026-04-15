@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panfilization Slots</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <h1>🎰 Panfilization Slots 5x3</h1>
+        <div id="balance" class="balance">Balance: 1000</div>
+      </header>
+
+      <section class="machine">
+        <div id="grid" class="grid"></div>
+        <div id="flash" class="flash hidden">ПАНФИЛИЗАЦИЯ</div>
+      </section>
+
+      <section class="controls">
+        <label for="bet">Bet</label>
+        <input id="bet" type="number" min="10" step="10" value="50" />
+        <button id="spinBtn">Spin</button>
+      </section>
+
+      <section class="result">
+        <p id="resultText">Press Spin to start.</p>
+      </section>
+    </main>
+
+    <audio id="coinsAudio" preload="auto">
+      <source src="https://www.soundjay.com/misc/sounds/coins-1.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
