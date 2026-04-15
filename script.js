@@ -1,13 +1,26 @@
 const symbols = ["🍒", "🍋", "🍉", "🔔", "⭐", "7️⃣"];
 const STORAGE_KEY = "panfilization-slots-state-v1";
+const MIN_BET = 10;
+const MAX_BET = 10000;
+const BET_STEP = 10;
+
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
 
 const gridEl = document.getElementById("grid");
 const balanceEl = document.getElementById("balance");
+const winsEl = document.getElementById("wins");
 const betEl = document.getElementById("bet");
+const betDownEl = document.getElementById("betDown");
+const betUpEl = document.getElementById("betUp");
 const spinBtn = document.getElementById("spinBtn");
 const resultTextEl = document.getElementById("resultText");
 const flashEl = document.getElementById("flash");
 const coinsAudio = document.getElementById("coinsAudio");
+const cells = [];
 
 function randomSymbol() {
   return symbols[Math.floor(Math.random() * symbols.length)];
@@ -41,11 +54,11 @@ function calculateWin(grid, bet) {
 
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return { balance: 1000, gamesPlayed: 0, totalWon: 0 };
+  if (!raw) return { balance: 1000, gamesPlayed: 0, totalWon: 0, winsCount: 0 };
   try {
     return JSON.parse(raw);
   } catch {
-    return { balance: 1000, gamesPlayed: 0, totalWon: 0 };
+    return { balance: 1000, gamesPlayed: 0, totalWon: 0, winsCount: 0 };
   }
 }
 
@@ -57,6 +70,7 @@ const state = loadState();
 
 function updateBalanceView() {
   balanceEl.textContent = `Balance: ${state.balance}`;
+  winsEl.textContent = `Wins: ${state.winsCount || 0}`;
 }
 
 function setupGrid() {
@@ -65,20 +79,23 @@ function setupGrid() {
     const cell = document.createElement("div");
     cell.className = "cell";
     cell.textContent = randomSymbol();
+    cells.push(cell);
     gridEl.appendChild(cell);
   }
 }
 
 function renderGrid(grid) {
   const flat = grid.flat();
-  [...gridEl.children].forEach((cell, idx) => {
+  cells.forEach((cell, idx) => {
     cell.textContent = flat[idx];
   });
 }
 
 function setSpinning(spinning) {
   spinBtn.disabled = spinning;
-  [...gridEl.children].forEach((cell) => {
+  betDownEl.disabled = spinning;
+  betUpEl.disabled = spinning;
+  cells.forEach((cell) => {
     cell.classList.toggle("spinning", spinning);
   });
 }
@@ -91,7 +108,7 @@ function showPanfilization() {
 }
 
 async function spin() {
-  const bet = Math.max(10, Math.floor(Number(betEl.value) || 50));
+  const bet = normalizeBetInput(betEl.value);
   betEl.value = String(bet);
 
   if (state.balance < bet) {
@@ -113,6 +130,9 @@ async function spin() {
   state.balance += profit;
   state.gamesPlayed += 1;
   state.totalWon += Math.max(win, 0);
+  if (win > 0) {
+    state.winsCount = (state.winsCount || 0) + 1;
+  }
   saveState(state);
 
   renderGrid(grid);
@@ -132,6 +152,24 @@ async function spin() {
   }
 }
 
+function normalizeBetInput(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 50;
+  const rounded = Math.floor(number / BET_STEP) * BET_STEP;
+  return Math.min(MAX_BET, Math.max(MIN_BET, rounded));
+}
+
+function changeBet(direction) {
+  const current = normalizeBetInput(betEl.value);
+  const next = current + BET_STEP * direction;
+  betEl.value = String(normalizeBetInput(next));
+}
+
 setupGrid();
 updateBalanceView();
 spinBtn.addEventListener("click", spin);
+betDownEl.addEventListener("click", () => changeBet(-1));
+betUpEl.addEventListener("click", () => changeBet(1));
+betEl.addEventListener("change", () => {
+  betEl.value = String(normalizeBetInput(betEl.value));
+});

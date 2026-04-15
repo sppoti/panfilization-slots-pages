@@ -2,29 +2,43 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>Panfilization Slots</title>
     <link rel="stylesheet" href="./styles.css" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
-    <main class="app">
-      <header class="header">
-        <h1>🎰 Panfilization Slots 5x3</h1>
-        <div id="balance" class="balance">Balance: 1000</div>
+    <main class="app-shell">
+      <header class="topbar">
+        <h1>Panfilization Slots</h1>
+        <div class="top-stats">
+          <div id="balance" class="chip">Balance: 1000</div>
+          <div id="wins" class="chip">Wins: 0</div>
+        </div>
       </header>
 
-      <section class="machine">
-        <div id="grid" class="grid"></div>
-        <div id="flash" class="flash hidden">ПАНФИЛИЗАЦИЯ</div>
+      <section class="machine-wrap">
+        <div class="machine">
+          <div class="coins-layer" aria-hidden="true"></div>
+          <div id="grid" class="grid"></div>
+          <div id="flash" class="flash hidden">ПАНФИЛИЗАЦИЯ</div>
+        </div>
       </section>
 
-      <section class="controls">
-        <label for="bet">Bet</label>
-        <input id="bet" type="number" min="10" step="10" value="50" />
-        <button id="spinBtn">Spin</button>
+      <section class="controls-row">
+        <button id="betDown" class="small-btn">-</button>
+        <label class="bet-box" for="bet">
+          <span>BET</span>
+          <input id="bet" type="number" min="10" step="10" value="50" />
+        </label>
+        <button id="betUp" class="small-btn">+</button>
+        <button id="spinBtn" class="spin-btn">SPIN</button>
       </section>
 
-      <section class="result">
+      <section class="result-panel">
         <p id="resultText">Press Spin to start.</p>
       </section>
     </main>
